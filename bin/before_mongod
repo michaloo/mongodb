@@ -1,0 +1,6 @@
+#!/bin/bash
+
+
+cat /app/config/mongod.conf | templater > "/etc/mongod.conf"
+
+mongod -f /etc/mongod.conf

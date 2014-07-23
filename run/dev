@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# since I'm working with coreos vagrant box
+# and root path is read-only there I need to specify
+# different base path there - empty DOCKER_REMOTE_PATH
+# and DOCKER_CLIENT_PATH works fine if you have native docker
+
+CONFIG="${DOCKER_REMOTE_PATH}${PWD#${DOCKER_CLIENT_PATH}}/config:/app/config"
+BIN="${DOCKER_REMOTE_PATH}${PWD#${DOCKER_CLIENT_PATH}}/bin:/app/bin"
+
+DB="${DOCKER_REMOTE_PATH}${PWD#${DOCKER_CLIENT_PATH}}/tmp/data:/data"
+
+
+if [ "$1" == "link" ]; then
+
+docker run -i -t \
+    --rm \
+    -w /root \
+    --link mongodb:mongodb \
+    --env-file dev.env \
+    -v $BIN \
+    -v $CONFIG \
+    -v $DB \
+    michaloo/mongodb
+
+else
+
+docker run -i -t \
+    --rm \
+    -w /root \
+    -p 27017:27017 \
+    --env-file dev.env \
+    --name mongodb \
+    --entrypoint bash \
+    -v $BIN \
+    -v $CONFIG \
+    -v $DB \
+    michaloo/mongodb
+
+fi
